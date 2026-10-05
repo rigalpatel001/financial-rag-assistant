@@ -1,0 +1,80 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+.venv/
+venv/
+env/
+ENV/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# Environment / Secrets
+.env
+.env.*
+!.env.example
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE / Editors
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# ML / RAG Data
+
+# Raw documents
+data/raw/
+
+# Processed/generated data
+data/processed/
+
+# Local benchmark downloads
+data/benchmarks/
+
+# Ground-truth/generated artifacts
+data/ground_truth/
+
+# Vector databases / indexes
+data/vectorstore/
+data/chroma/
+data/qdrant/
+
+# Model checkpoints / weights
+models/
+checkpoints/
+
+# Experiment outputs
+experiments/**/outputs/
+experiments/**/artifacts/
+
+
+# Temporary files
+*.tmp
+*.temp
+*.cache
+
+
+# Coverage / Testing
+.coverage
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+
+# Generated reports
+reports/generated/
