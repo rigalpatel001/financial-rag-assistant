@@ -44,6 +44,8 @@ data/processed/
 
 # Local benchmark downloads
 data/benchmarks/
+data/documents/
+data/samples/
 
 # Ground-truth/generated artifacts
 data/ground_truth/
