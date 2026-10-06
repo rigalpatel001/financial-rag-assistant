@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-from pathlib import Path
 from typing import Any
 
 
@@ -19,3 +18,13 @@ class FinancialDocument:
     @property
     def page_count(self) -> int:
         return len(self.pages)
+
+
+@dataclass
+class DocumentChunk:
+    chunk_id: str
+    document_id: str
+    page_number: int
+    text: str
+    chunk_index: int
+    metadata: dict[str, Any] = field(default_factory=dict)
