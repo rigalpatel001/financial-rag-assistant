@@ -2,6 +2,8 @@ import numpy as np
 
 from src.fdi_ml.embeddings.encoder import EmbeddingEncoder
 from src.fdi_ml.ingestion.models import DocumentChunk
+# from src.fdi_ml.retrieval.vector_store import InMemoryVectorStore
+from src.fdi_ml.retrieval.qdrant_store import QdrantVectorStore
 
 
 class SemanticRetriever:
@@ -9,40 +11,41 @@ class SemanticRetriever:
     def __init__(
         self,
         embedding_encoder: EmbeddingEncoder,
+        vector_store: InMemoryVectorStore,
     ):
         self.embedding_encoder = embedding_encoder
+        self.vector_store = vector_store
+
+    def index(
+        self,
+        chunks: list[DocumentChunk],
+    ) -> None:
+
+        chunk_texts = [chunk.text for chunk in chunks]
+
+        chunk_embeddings = self.embedding_encoder.encode(
+            chunk_texts
+        )
+
+        self.vector_store.add(
+            chunks=chunks,
+            embeddings=chunk_embeddings,
+        )
 
     def retrieve(
         self,
         query: str,
-        chunks: list[DocumentChunk],
-        chunk_embeddings: np.ndarray,
         top_k: int = 5,
     ) -> list[tuple[DocumentChunk, float]]:
 
-        if not chunks:
-            return []
+        query_embedding = self.embedding_encoder.encode(
+            [query]
+        )[0]
 
-        if len(chunks) != len(chunk_embeddings):
-            raise ValueError(
-                "Number of chunks must match number of embeddings."
-            )
-
-        if top_k <= 0:
-            raise ValueError("top_k must be greater than 0.")
-
-        query_embedding = self.embedding_encoder.encode([query])[0]
-
-        scores = chunk_embeddings @ query_embedding
-
-        ranked_indices = np.argsort(scores)[::-1][:top_k]
-
-        results = [
-            (chunks[index], float(scores[index]))
-            for index in ranked_indices
-        ]
-
-        return results
+        return self.vector_store.search(
+            query_embedding=query_embedding,
+            top_k=top_k,
+        )
 
 
 if __name__ == "__main__":
@@ -71,27 +74,32 @@ if __name__ == "__main__":
 
     chunks = chunker.chunk(document)
 
-    # 3. Create embeddings for all chunks
+    # 3. Create embedding model
     encoder = EmbeddingEncoder()
 
-    chunk_texts = [chunk.text for chunk in chunks]
+    # 4. Create vector store
+    # vector_store = InMemoryVectorStore()
+    vector_store = QdrantVectorStore(
+        collection_name="financial_documents",
+    )
 
-    chunk_embeddings = encoder.encode(chunk_texts)
+    # 5. Create retriever
+    retriever = SemanticRetriever(
+        embedding_encoder=encoder,
+        vector_store=vector_store,
+    )
 
-    # 4. Create retriever
-    retriever = SemanticRetriever(encoder)
+    # 6. Index chunks
+    retriever.index(chunks)
 
-    # 5. Ask a question
+    # 7. Search
     query = "What was Apple's total net sales in 2022?"
 
     results = retriever.retrieve(
         query=query,
-        chunks=chunks,
-        chunk_embeddings=chunk_embeddings,
         top_k=5,
     )
 
-    # 6. Display results
     print("=" * 60)
     print("SEMANTIC RETRIEVAL")
     print("=" * 60)
@@ -102,7 +110,6 @@ if __name__ == "__main__":
     for rank, (chunk, score) in enumerate(results, start=1):
 
         print("\n" + "-" * 60)
-
         print(f"Rank       : {rank}")
         print(f"Score      : {score:.4f}")
         print(f"Page       : {chunk.page_number}")

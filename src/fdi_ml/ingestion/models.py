@@ -24,6 +24,7 @@ class FinancialDocument:
 class DocumentChunk:
     chunk_id: str
     document_id: str
+    filename: str
     page_number: int
     text: str
     chunk_index: int

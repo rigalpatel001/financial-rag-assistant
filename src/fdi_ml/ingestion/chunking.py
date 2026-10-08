@@ -52,6 +52,7 @@ class FixedSizeChunker:
                         DocumentChunk(
                             chunk_id=str(uuid4()),
                             document_id=document.document_id,
+                            filename=document.filename,
                             page_number=page.page_number,
                             text=chunk_text,
                             chunk_index=chunk_index,
