@@ -1,5 +1,5 @@
 from pathlib import Path
-import uuid
+from uuid import NAMESPACE_URL, uuid5
 
 import pymupdf
 
@@ -21,7 +21,11 @@ class PDFParser:
                 f"Expected a PDF file, got: {file_path.suffix}"
             )
 
-        document_id = str(uuid.uuid4())
+        document_id = str(uuid5(
+            NAMESPACE_URL,
+            f"financial-rag-assistant:{file_path.name}",
+        )
+        )
 
         pages: list[DocumentPage] = []
 

@@ -1,4 +1,4 @@
-from uuid import uuid4
+from uuid import NAMESPACE_URL, uuid5
 
 from src.fdi_ml.ingestion.models import DocumentChunk, FinancialDocument
 
@@ -48,9 +48,20 @@ class FixedSizeChunker:
                 chunk_text = text[start:end].strip()
 
                 if chunk_text:
+                    chunk_id = str(
+                        uuid5(
+                            NAMESPACE_URL,
+                            (
+                                f"{document.document_id}:"
+                                f"{page.page_number}:"
+                                f"{chunk_index}:"
+                                f"{chunk_text}"
+                            ),
+                        )
+                    )
                     chunks.append(
                         DocumentChunk(
-                            chunk_id=str(uuid4()),
+                            chunk_id=chunk_id,
                             document_id=document.document_id,
                             filename=document.filename,
                             page_number=page.page_number,

@@ -52,6 +52,7 @@ data/ground_truth/
 
 # Vector databases / indexes
 data/vectorstore/
+data/vector_store/
 data/chroma/
 data/qdrant/
 
